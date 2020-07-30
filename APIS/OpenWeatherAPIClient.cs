@@ -17,6 +17,12 @@ namespace eckumoc_netcore_weather.APIS
     // <summary>    
     public class OpenWeatherAPIClient
     {
+        private static string url = "https://api.openweathermap.org/";
+        private static string api_key = null;
+
+        
+
+
 
     }
 }
