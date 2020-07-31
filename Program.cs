@@ -11,6 +11,9 @@ namespace eckumoc_netcore_weather
 {
     public class Program
     {
+        // <summary>
+        // Точка входа в приложение.
+        // <summary>
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();

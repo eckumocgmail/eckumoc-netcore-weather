@@ -19,13 +19,13 @@
 
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
+    <Compile Remove="APIS - Копировать\**" />
     <Content Remove="$(SpaRoot)**" />
+    <Content Remove="APIS - Копировать\**" />
+    <EmbeddedResource Remove="APIS - Копировать\**" />
     <None Remove="$(SpaRoot)**" />
+    <None Remove="APIS - Копировать\**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Новая папка\" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
