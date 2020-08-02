@@ -25,16 +25,16 @@
             [routerLinkActive]="['link-active']"
             [routerLinkActiveOptions]="{ exact: true }"
           >
-            <a class="nav-link" [routerLink]="['/']">
+            <button mat-raised-button class="nav-link" [routerLink]="['/']">
               Прогноз на сегодня
-            </a>
+            </button>
           </li>
           <li class="nav-item" [routerLinkActive]="['btn-primary']">
-            <a class="nav-link" [routerLink]="['/daily']">
+            <button mat-raised-button class="nav-link" [routerLink]="['/daily']">
               Прогноз на неделю
-            </a>
+            </button>
           </li>
-           
+
         </ul>
       </div>
     </div>

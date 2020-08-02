@@ -10,36 +10,38 @@ import { IconsDispatcherService } from './services/icons-dispatcher.service';
 @Component({
   selector: 'app-_forecast',
   template: `
-    <div *ngIf="forecast && city">
+  <div style="display: flex; flex-firection: row; flex-wrap: wrap;">
+    <div *ngIf="forecast && city" >
       <h1>{{city.country=='RU'? 'Россия': city.country}}, {{forecast.name}}</h1>
       <h5>{{ (forecast.dt*1000)| date:'dd.MM.yyyy, hh час(ов)' }} </h5>
       <hr/>
-      <div style="display: flex; flex-firection: row; flex-wrap: nowrap; width: 100%;">
-        <div  >
+      <div style="margin: 10px; display: flex; flex-firection: row; flex-wrap: wrap; width: 100%; ">
+        <button mat-raised-button>
           <dl>
             <dt>Широта &nbsp;</dt>
             <dd>{{city.coord.lat}}</dd>
             <dt>Долгота</dt>
             <dd>{{city.coord.lon}}</dd>
           </dl>
-        </div>
+        </button>
 
 
-        <div *ngIf="forecast" style="justify-self: flex-end; margin-left: auto;">
+        <button mat-raised-button *ngIf="forecast" style="justify-self: flex-end; margin: 10px;  margin-left: auto; ">
           <div *ngFor="let weather of forecast.weather">
-            <div style="width: 225px; height: 225px; " align="center">
+            <div align="center">
+              <div>{{ weather.name }}</div>
               <img [attr.src]="'http://openweathermap.org/img/wn/'+weather.icon.replace('n','d')+'@'+'2x.png'"/>
               <div>{{ weather.description }}</div>
             </div>
           </div>
-        </div>
+        </button>
 
       </div>
-      <hr/>
+      <!-- <hr/> -->
     </div>
 
     <!-- <img [attr.src]="icons.getSnowUrl()"/> -->
-    <div *ngIf="forecast">
+    <button mat-raised-button *ngIf="forecast" style="margin: 10px; padding: 0px; width: 100%;">
 
       <div>
         <table class="table">
@@ -96,7 +98,8 @@ import { IconsDispatcherService } from './services/icons-dispatcher.service';
         </table>
       </div>
 
-    </div>
+    </button>
+  </div>
   `,
   styles: []
 })

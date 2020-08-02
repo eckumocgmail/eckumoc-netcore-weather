@@ -1,7 +1,7 @@
 import { MatButtonModule } from '@angular/material/button';
 import { CitiesService } from './services/cities.service';
 import { RouterModule } from '@angular/router';
-import { HourlyModule } from './hourly/hourly.module';
+
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OpenWeatherService } from './services/open-weather.service';

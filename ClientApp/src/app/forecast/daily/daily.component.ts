@@ -8,25 +8,33 @@ import { CitiesService } from './../services/cities.service';
 import { OpenWeatherService } from './../services/open-weather.service';
 import { OnecallResponseModel } from '../services/messages/onecall-response.model';
 import { ChartService } from 'src/app/services/chart.service';
+import { FormGroup, FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-daily',
   template: `
-    <div *ngIf="city">
+    <div *ngIf="city" style="width: 100%;">
       <h1>{{city.country}}, {{city.name}}</h1>
 
 
       <div style="display: flex; flex-direction: row; width: 100%; flex-wrap: nowrap;">
         <div  style="width: 100%;">
+
+
           <mat-form-field appearance="fill">
-            <mat-label>Enter a date range</mat-label>
-            <mat-date-range-input [rangePicker]="picker">
-              <input matStartDate placeholder="Start date">
-              <input matEndDate placeholder="End date">
-            </mat-date-range-input>
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-date-range-picker #picker></mat-date-range-picker>
+            <mat-label>Начало периода</mat-label>
+            <input matInput [matDatepicker]="beginPicker" [(ngModel)]="minDate" (input)="trace($event)" (changes)="trace($event)">
+            <mat-datepicker-toggle matSuffix [for]="beginPicker" (changes)="trace($event)"></mat-datepicker-toggle>
+            <mat-datepicker #beginPicker></mat-datepicker>
           </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Конец пеиода</mat-label>
+            <input matInput [matDatepicker]="endPicker" [min]="minDate" [(ngModel)]="maxDate" (input)="trace($event)" (changes)="trace($event)">
+            <mat-datepicker-toggle matSuffix [for]="endPicker" (changes)="trace($event)"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+
         </div>
 
         <div style="width: 100%; padding-left: 20px; padding-right: 20px;">
@@ -44,13 +52,7 @@ import { ChartService } from 'src/app/services/chart.service';
         <mat-button-toggle-group style="width: 100%;" [multiple]="true" style="display: flex; flex-direction: column; flex-wrap: nowrap;">
           <mat-button-toggle *ngFor="let param of params" (change)="toggleParam(param.name)"  [value]="param.value" style="width: 100%;"  > {{ param.label }} </mat-button-toggle>
         </mat-button-toggle-group>
-        <!-- <ul class="nav nav-pills flex-column">
-          <li class="nav-item" *ngFor="let link of links">
-            <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="['./'+link.path]">
-              {{ link.path }}
-            </a>
-          </li>
-        </ul> -->
+
       </div>
       <div style="width: 100%;">
         <div *ngIf="view=='table'" style="width: 100%;">
@@ -77,7 +79,7 @@ import { ChartService } from 'src/app/services/chart.service';
             </tbody>
           </table>
         </div>
-        <div [hidden]="view!='chart'">
+        <div [hidden]="view!='chart' && param.value" *ngFor="let param of params">
 
           <div #node style="width: 100%; height: 100%;"></div>
         </div>
@@ -87,25 +89,29 @@ import { ChartService } from 'src/app/services/chart.service';
   styles: []
 })
 export class DailyComponent implements OnInit,OnChanges {
+
+  //datepickers model
   minDate = new Date();
   maxDate = new Date();
-  links = [{path: 'test'}];
 
+
+  //chart model
   @ViewChild('node', {static: true} ) node: ElementRef;
   title = 'Динамика изменения температуры';
   series: { name: string, data: number[] }[] = [];
-
   view:     'table'|'chart'='chart';
   cities:   CityModel[];
   city:     CityModel;
   categories: string[] = [];
 
+  //params model
   params = [
     { label: 'температура', name: 't', value: true },
     { label: 'влажность', name: 'v', value: false },
     { label: 'давление', name: 'd', value: false },
   ]
 
+  //data model
   onecall:  OnecallResponseModel = new OnecallResponseModel();
 
   constructor(
@@ -150,7 +156,8 @@ export class DailyComponent implements OnInit,OnChanges {
     if( !this.onecall || !this.onecall.daily ){
       return;
     }else{
-
+      ctrl.minDate = new Date('01.01.2970');
+      ctrl.maxDate = new Date('01.01.1970');
       this.onecall.daily.forEach(day=>{
         let d: Date = new Date(day.dt*1000);
         let datestr =
@@ -158,6 +165,8 @@ export class DailyComponent implements OnInit,OnChanges {
           (d.getMonth()<10?'0'+d.getMonth(): d.getMonth())+'.'+
           (d.getFullYear());
         datestr = ctrl.timeUtilitiesService.getDayOfWeek(d) + '('+datestr+')';
+        ctrl.minDate = ctrl.minDate.getTime()>d.getTime()? d: ctrl.minDate;
+        ctrl.maxDate = ctrl.maxDate.getTime()<d.getTime()? d: ctrl.maxDate;
         if( ctrl.categories.indexOf(datestr)==-1 ){
           ctrl.categories.push(datestr);
         }
@@ -184,6 +193,10 @@ export class DailyComponent implements OnInit,OnChanges {
     } else {
         this.charts.chart(this.node.nativeElement, options);
     }
+  }
+
+  trace( evt ){
+    console.log(evt);
   }
 
   updateData(){
