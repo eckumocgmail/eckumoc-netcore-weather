@@ -20,7 +20,7 @@ html {
 }
 
 .link-active {
-  background-color: var(--blue);
+  background-color: black;
   color: white;
 }
 

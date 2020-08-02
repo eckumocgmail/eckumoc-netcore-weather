@@ -14,7 +14,8 @@ import { FormGroup, FormControl } from '@angular/forms';
   selector: 'app-daily',
   templateUrl: './daily.component.html',
   styles: [
-    `.shadow-box{border-radius: 5px; box-shadow: 0px 4px 3px -2px rgba(0, 0, 0, 0.4), 0px 2px 2px 0px rgba(0, 0, 0, 0.24), 0px 2px 6px 0px rgba(0, 0, 0, 0.22);} `
+    `.link-active{background-color: black; color: white;}
+      .shadow-box{border-radius: 5px; box-shadow: 0px 4px 3px -2px rgba(0, 0, 0, 0.4), 0px 2px 2px 0px rgba(0, 0, 0, 0.24), 0px 2px 6px 0px rgba(0, 0, 0, 0.22);} `
   ]
 })
 export class DailyComponent implements OnInit,OnChanges {
@@ -62,10 +63,11 @@ export class DailyComponent implements OnInit,OnChanges {
     }else{
       this.setCitylist(this.citiesService.cities);
     }
-    this.updateChart();
+    setTimeout(()=>{ctrl.updateChart();},10000);
   }
 
   ngOnChanges( changes: SimpleChanges ){
+    console.log(changes);
     this.updateChart();
   }
 
@@ -76,6 +78,7 @@ export class DailyComponent implements OnInit,OnChanges {
   }
 
   setView( view: 'table'|'chart' ){
+    console.log( view );
     this.view = view;
     this.updateChart();
   }
@@ -131,6 +134,29 @@ export class DailyComponent implements OnInit,OnChanges {
 
   trace( evt ){
     console.log(evt);
+  }
+
+
+  setRandomTimeRange(){
+    const ctrl = this;
+    of(ctrl.cities[ Math.floor(Math.random()*ctrl.cities.length)]).subscribe((_city:CityModel)=>{
+      console.log(_city);
+      ctrl.city = _city;
+      ctrl.service.getOneCall(_city.name, new Date() ).subscribe((onecall: OnecallResponseModel)=>{
+        console.log( onecall );
+        ctrl.onecall = onecall;
+        let i1 = Math.floor(onecall.daily.length*Math.random());
+        let i2 = Math.floor(onecall.daily.length*Math.random());
+        const days = [];
+        for( let i=Math.min(i1,i2); i<Math.max(i1,i2); i++ ){
+          days.push(onecall.daily[i]);
+        }
+        onecall.daily = days;
+        if( ctrl.view=='chart' ){
+          ctrl.updateChart();
+        }
+      });
+    });
   }
 
   updateData(){

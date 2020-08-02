@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eckumoc-netcore-weather", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eckumoc-netcore-weather-api", "..\..\eckumoc-netcore-weather-api\eckumoc-netcore-weather-api.csproj", "{49EDBFE7-218A-427F-AF59-50A1913D2979}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eckumoc-netcore-weather-backend", "..\..\..\..\Wrk\eckumoc-netcore-weather-backend\eckumoc-netcore-weather-backend.csproj", "{069FAD4F-F7E7-401B-94E7-F4B6B8AB5754}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{49EDBFE7-218A-427F-AF59-50A1913D2979}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49EDBFE7-218A-427F-AF59-50A1913D2979}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49EDBFE7-218A-427F-AF59-50A1913D2979}.Release|Any CPU.Build.0 = Release|Any CPU
+		{069FAD4F-F7E7-401B-94E7-F4B6B8AB5754}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{069FAD4F-F7E7-401B-94E7-F4B6B8AB5754}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{069FAD4F-F7E7-401B-94E7-F4B6B8AB5754}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{069FAD4F-F7E7-401B-94E7-F4B6B8AB5754}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

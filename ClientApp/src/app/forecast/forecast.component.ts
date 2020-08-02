@@ -31,6 +31,10 @@ import { IconsDispatcherService } from './services/icons-dispatcher.service';
           </dl>
         </button>
 
+        <button mat-raised-button style="margin: 10px;" (click)="update()">
+          Сбросить локацию
+        </button>
+
 
         <button mat-raised-button *ngIf="forecast" style="justify-self: flex-end; margin: 10px;  margin-left: auto; ">
           <div *ngFor="let weather of forecast.weather">
