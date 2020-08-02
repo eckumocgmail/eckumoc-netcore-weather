@@ -8,7 +8,7 @@ import { OpenWeatherService } from './services/open-weather.service';
 import { IconsDispatcherService } from './services/icons-dispatcher.service';
 
 @Component({
-  selector: 'app-_forecast',
+  selector: 'forecast',
   template: `
   <div style="display: flex; flex-firection: row; flex-wrap: wrap;">
     <div *ngIf="forecast && city" >
@@ -16,10 +16,16 @@ import { IconsDispatcherService } from './services/icons-dispatcher.service';
       <h5>{{ (forecast.dt*1000)| date:'dd.MM.yyyy, hh час(ов)' }} </h5>
       <hr/>
       <div style="margin: 10px; display: flex; flex-firection: row; flex-wrap: wrap; width: 100%; ">
-        <button mat-raised-button>
+
+        <button mat-raised-button style="margin: 10px;">
           <dl>
             <dt>Широта &nbsp;</dt>
             <dd>{{city.coord.lat}}</dd>
+          </dl>
+        </button>
+
+        <button mat-raised-button style="margin: 10px;">
+          <dl>
             <dt>Долгота</dt>
             <dd>{{city.coord.lon}}</dd>
           </dl>
@@ -101,7 +107,7 @@ import { IconsDispatcherService } from './services/icons-dispatcher.service';
     </button>
   </div>
   `,
-  styles: []
+  styles: [`.shadow-box{border-radius: 5px; box-shadow: 0px 4px 3px -2px rgba(0, 0, 0, 0.4), 0px 2px 2px 0px rgba(0, 0, 0, 0.24), 0px 2px 6px 0px rgba(0, 0, 0, 0.22);} `]
 })
 export class ForecastComponent implements OnInit {
 

@@ -12,81 +12,10 @@ import { FormGroup, FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-daily',
-  template: `
-    <div *ngIf="city" style="width: 100%;">
-      <h1>{{city.country}}, {{city.name}}</h1>
-
-
-      <div style="display: flex; flex-direction: row; width: 100%; flex-wrap: nowrap;">
-        <div  style="width: 100%;">
-
-
-          <mat-form-field appearance="fill">
-            <mat-label>Начало периода</mat-label>
-            <input matInput [matDatepicker]="beginPicker" [(ngModel)]="minDate" (input)="trace($event)" (changes)="trace($event)">
-            <mat-datepicker-toggle matSuffix [for]="beginPicker" (changes)="trace($event)"></mat-datepicker-toggle>
-            <mat-datepicker #beginPicker></mat-datepicker>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill">
-            <mat-label>Конец пеиода</mat-label>
-            <input matInput [matDatepicker]="endPicker" [min]="minDate" [(ngModel)]="maxDate" (input)="trace($event)" (changes)="trace($event)">
-            <mat-datepicker-toggle matSuffix [for]="endPicker" (changes)="trace($event)"></mat-datepicker-toggle>
-            <mat-datepicker #endPicker></mat-datepicker>
-          </mat-form-field>
-
-        </div>
-
-        <div style="width: 100%; padding-left: 20px; padding-right: 20px;">
-          <mat-button-toggle-group style="width: 100%;" (change)="setView($event.value)" [value]="view">
-            <mat-button-toggle [value]="'table'" style="width: 100%;"> таблица </mat-button-toggle>
-            <mat-button-toggle [value]="'chart'" style="width: 100%;"> диаграмма </mat-button-toggle>
-          </mat-button-toggle-group>
-        </div>
-      </div>
-    </div>
-
-    <div style="display: flex; flex-direction: row; flex-wrap: nowrap; width: 100%; height: 100%;">
-      <div>
-        <h6>Параметры: </h6>
-        <mat-button-toggle-group style="width: 100%;" [multiple]="true" style="display: flex; flex-direction: column; flex-wrap: nowrap;">
-          <mat-button-toggle *ngFor="let param of params" (change)="toggleParam(param.name)"  [value]="param.value" style="width: 100%;"  > {{ param.label }} </mat-button-toggle>
-        </mat-button-toggle-group>
-
-      </div>
-      <div style="width: 100%;">
-        <div *ngIf="view=='table'" style="width: 100%;">
-          <table class="table" *ngIf="onecall" style="width: 100%;">
-            <thead>
-              <tr>
-                <th scope="col">Дата</th>
-                <th scope="col">Утро</th>
-                <th scope="col">День</th>
-                <th scope="col">Вечер</th>
-                <th scope="col">Ночь</th>
-
-              </tr>
-            </thead>
-            <tbody *ngIf="onecall.daily">
-              <tr *ngFor="let day of onecall.daily">
-                <th scope="row"> {{(day.dt*1000) | date: 'dd.MM.yyyy'}} </th>
-
-                <td>{{day.temp.morn}} </td>
-                <td>{{day.temp.day}} </td>
-                <td>{{day.temp.eve}} </td>
-                <td>{{day.temp.night}} </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div [hidden]="view!='chart' && param.value" *ngFor="let param of params">
-
-          <div #node style="width: 100%; height: 100%;"></div>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: []
+  templateUrl: './daily.component.html',
+  styles: [
+    `.shadow-box{border-radius: 5px; box-shadow: 0px 4px 3px -2px rgba(0, 0, 0, 0.4), 0px 2px 2px 0px rgba(0, 0, 0, 0.24), 0px 2px 6px 0px rgba(0, 0, 0, 0.22);} `
+  ]
 })
 export class DailyComponent implements OnInit,OnChanges {
 
@@ -106,16 +35,21 @@ export class DailyComponent implements OnInit,OnChanges {
 
   //params model
   params = [
-    { label: 'температура', name: 't', value: true },
-    { label: 'влажность', name: 'v', value: false },
-    { label: 'давление', name: 'd', value: false },
+    { label: 'температура', name: 'temp',     value: true },
+    { label: 'влажность',   name: 'humidity', value: false },
+    { label: 'давление',    name: 'pressure', value: false },
   ]
+  paramsMap = {
+    temp:     this.params[0],
+    humidity: this.params[1],
+    pressure: this.params[2],
+  }
 
   //data model
   onecall:  OnecallResponseModel = new OnecallResponseModel();
 
   constructor(
-    private timeUtilitiesService: TimeUtilitiesService,
+    public timeUtilitiesService: TimeUtilitiesService,
     private charts: ChartService,
     private service: OpenWeatherService,
     private citiesService: CitiesService ) { }

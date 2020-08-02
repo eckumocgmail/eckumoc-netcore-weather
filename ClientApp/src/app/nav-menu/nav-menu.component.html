@@ -21,18 +21,18 @@
       >
         <ul class="navbar-nav flex-grow">
           <li
-            class="nav-item"
+
             [routerLinkActive]="['link-active']"
             [routerLinkActiveOptions]="{ exact: true }"
           >
-            <button mat-raised-button class="nav-link" [routerLink]="['/']">
+            <div class="shadow-box " [routerLink]="['/']">
               Прогноз на сегодня
-            </button>
+            </div>
           </li>
-          <li class="nav-item" [routerLinkActive]="['btn-primary']">
-            <button mat-raised-button class="nav-link" [routerLink]="['/daily']">
+          <li class="nav-item" [routerLinkActive]="['link-active']">
+            <div class="shadow-box " [routerLink]="['/daily']">
               Прогноз на неделю
-            </button>
+            </div>
           </li>
 
         </ul>

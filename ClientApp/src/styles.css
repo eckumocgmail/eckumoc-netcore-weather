@@ -16,7 +16,11 @@ code {
 }
 
 *{
-  padding: 0px; margin: 0px; width: auto  ;
+  padding: 0px;
+  margin: 0px;
+  width: auto  ;
+  word-break: break-all;
+  word-wrap: break-word;
 }
 
 html, body { height: 100%; }

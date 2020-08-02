@@ -19,8 +19,33 @@ export class TimeUtilitiesService
     return new Date(timestamp);
   }
 
-  getDayOfWeek( date: Date ){
+  getDayOfWeek( d: Date ){
+    if( typeof(d)=='number' ){
+      d = new Date(d*1000);
+    }
+    const date = d;
     const days = ['Пн','Вт','Ср','Чт','Пт','Суб','Вс'];
     return days[date.getDay()];
+  }
+
+  getFullDayOfWeek( d: Date ){
+    if( typeof(d)=='number' ){
+      d = new Date(d*1000);
+    }
+    const date = d;
+    const days = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресение'];
+    return days[date.getDay()];
+  }
+
+
+  toDateString(d){
+    if( typeof(d)=='number' ){
+      d = new Date(d*1000);
+    }
+    let datestr =
+      (d.getDate()<10?'0'+d.getDate(): d.getDate())+'.'+
+      (d.getMonth()<10?'0'+d.getMonth(): d.getMonth())+'.'+
+      (d.getFullYear());
+    return datestr;
   }
 }
