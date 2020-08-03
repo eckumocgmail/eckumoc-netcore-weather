@@ -1,6 +1,6 @@
 <div *ngIf="city" style="width: 100%;">
 
-    <h1>{{city.country}}, {{city.name}}</h1>
+    <h1> России, {{city.name}} </h1>
   
     <div style="display: flex; flex-direction: row; width: 100%; flex-wrap: nowrap;">
   
@@ -24,14 +24,14 @@
             <mat-icon>menu</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
-              <button mat-menu-item (click)="setView('table')">
-                <mat-icon>border_all</mat-icon>
-                <span style="width: 100%;"> таблица </span>
-              </button>
-              <button mat-menu-item (click)="setView('chart')">
-                <mat-icon>insert_chart</mat-icon>
-                <span  style="width: 100%;"> диаграмма </span>
-              </button>
+            <button mat-menu-item (click)="setView('table')">
+              <mat-icon>border_all</mat-icon>
+              <span style="width: 100%;"> таблица </span>
+            </button>
+            <button mat-menu-item (click)="setView('chart')">
+              <mat-icon>insert_chart</mat-icon>
+              <span  style="width: 100%;"> диаграмма </span>
+            </button>
           </mat-menu>
       </div>
     </div>
@@ -101,9 +101,11 @@
           </div>
   
           <!-- chart view -->
-          <div [hidden]="view!='chart'" style=" width: 100%; ">
-            <button #node style="width: 100%; height: 100%;" >
-            </button>
+          <div [hidden]="view!='chart'" style=" width: 100%; height: 100%;">
+            <div *ngFor="let param of params">
+              <ui-chart *ngIf="param.value" [title]="title" [series]="paramsMap[param.name].data" [categories]="categories"></ui-chart>
+            </div>
+            
           </div>
         </div>
   

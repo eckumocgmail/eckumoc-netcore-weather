@@ -36,7 +36,7 @@ import { SharedModule } from '../shared/shared.module';
     RouterModule.forChild([
       { path: '',       component: ForecastComponent  },
       { path: 'daily',  component: DailyComponent }
-    ])
+    ]),    
   ],
   providers: [
     OpenWeatherService,

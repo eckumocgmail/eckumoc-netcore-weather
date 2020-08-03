@@ -41,7 +41,7 @@ export class DailyComponent implements OnInit,OnChanges {
   //chart model
   @ViewChild('node', {static: true} ) node: ElementRef;
   title = 'Динамика изменения температуры';
-  series: { name: string, data: number[] }[] = [];
+  //series: { name: string, data: number[] }[] = [];
   view:     'table'|'chart'='chart';
   cities:   CityModel[];
   city:     CityModel;
@@ -50,9 +50,9 @@ export class DailyComponent implements OnInit,OnChanges {
 
   //params model
   params = [
-    { label: 'температура', name: 'temp',     value: true },
-    { label: 'влажность',   name: 'humidity', value: false },
-    { label: 'давление',    name: 'pressure', value: false },
+    { label: 'температура', name: 'temp',     value: true , data: [] },
+    { label: 'влажность',   name: 'humidity', value: false, data: [] },
+    { label: 'давление',    name: 'pressure', value: false, data: [] },
   ]
   paramsMap = {
     temp:     this.params[0],
@@ -154,9 +154,13 @@ export class DailyComponent implements OnInit,OnChanges {
   updateSeries( ){
     const ctrl = this;
     const props = {};
-    this.series = [];
+    this.paramsMap.temp.data = [];
+    this.paramsMap.humidity.data = [];
+    this.paramsMap.pressure.data = [];
     ctrl.categories = [];
-    ctrl.series.push(props['temp']={ name: 'Температура', data: [] });
+
+    // ###
+    ctrl.paramsMap.temp.data.push(props['temp']={ name: 'Температура', data: [] });
 
     if( !this.onecall || !this.onecall.daily ){
       return;
@@ -174,6 +178,8 @@ export class DailyComponent implements OnInit,OnChanges {
         //if( ctrl.categories.indexOf(datestr)==-1 ){
           ctrl.categories.push(datestr);
         //}
+
+        // ###
         props['temp'].data.push(day.temp.day);
       });
       
@@ -181,66 +187,7 @@ export class DailyComponent implements OnInit,OnChanges {
   }
 
   updateChart(){
-    this.updateSeries();
-    const options = new Object(
-    {   
-      chart: {
-         type: 'area'
-      },
-      title: {
-         text: this.title
-      },
-      subtitle : {
-         style: {
-            position: 'absolute',
-            right: '0px',
-            bottom: '10px'
-         }
-      },
-      legend : {
-         layout: 'vertical',
-         align: 'left',
-         verticalAlign: 'top',
-         x: -150,
-         y: 100,
-         floating: true,
-         borderWidth: 1,
-         backgroundColor: '#FFFFFF'
-      },
-      xAxis:{
-         categories: this.categories
-      },
-      yAxis : {
-         title: {
-            text: 'Температура (℃)'
-         },
-         labels: {
-            formatter: function () {
-               return this.value;
-            }
-         },
-         min: 0
-      },
-      tooltip : {
-         formatter: function () {
-            return '<b>' + this.series.name + '</b><br/>' + this.x + ': ' + this.y;
-         }
-      },
-      plotOptions : {
-         area: {
-            fillOpacity: 0.5 
-         }
-      },
-      credits:{
-         enabled: false
-      },
-      series: this.series
-    });
-    if ( !this.node ) {
-        console.error('#node not defined at template of shared chart component');
-    } else {
-        this.charts.chart(this.node.nativeElement, options);
-    }
+    this.updateSeries();     
   }
 
   trace( evt ){
