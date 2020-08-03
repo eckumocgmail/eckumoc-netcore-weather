@@ -40,6 +40,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTreeModule } from '@angular/material/tree';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 
 
@@ -91,6 +92,7 @@ import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
     MatTreeModule,
     PortalModule,
     ScrollingModule,
+    SharedModule
   ],
   providers: [
     //{provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: {useUtc: true}}

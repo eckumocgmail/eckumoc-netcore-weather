@@ -1,8 +1,6 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { ChartService } from 'src/app/services/chart.service';
-
-
+import { Component, OnInit, ElementRef, ViewChild, Input, OnChanges, SimpleChanges } from '@angular/core';
 import * as Highcharts from 'highcharts';
+import { ChartService } from './chart.service';
 
 declare var require: any;
 const Boost = require('highcharts/modules/boost');
@@ -15,88 +13,94 @@ More(Highcharts);
 noData(Highcharts);
 
 @Component({
-  selector: 'app-chart',
+  selector: 'ui-chart',
   template: `
-    <div #node style="width: 100%; height: 100%;" >
+    <div #node style="width: 100%; height: 100%;">
     </div>
   `,
   styles: []
 })
-export class ChartComponent implements OnInit {
-
+export class ChartComponent implements OnInit, OnChanges {
 
    @ViewChild('node', {static: true} ) node: ElementRef;
-   ngOnInit(){
-     if ( !this.node ) {
-       console.error('chartElement undefined in StructureChartComponent');
-     } else {
-         Highcharts.chart(this.node.nativeElement, new Object(this.chartOptions) );
-     }
+
+   @Input() title: string = 'Динамика';
+   @Input() yLabel: string = 'Подпись оси Y';
+   @Input() series: { name: string, data: number[] }[] = [];
+   @Input() categories: string[] = [];
+
+   constructor( 
+      private charts: ChartService ){
    }
- 
-   title = 'Area chart';
-   highcharts = Highcharts;
-   chartOptions = {   
-       chart: {
-          type: 'area'
-       },
-       title: {
-          text: 'Average fruit consumption during one week'
-       },
-       subtitle : {
-          style: {
-             position: 'absolute',
-             right: '0px',
-             bottom: '10px'
-          }
-       },
-       legend : {
-          layout: 'vertical',
-          align: 'left',
-          verticalAlign: 'top',
-          x: -150,
-          y: 100,
-          floating: true,
-          borderWidth: 1,
-          backgroundColor: '#FFFFFF'
-       },
-       xAxis:{
-          categories: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] 
-       },
-       yAxis : {
-          title: {
-             text: 'Number of units'
-          },
-          labels: {
-             formatter: function () {
-                return this.value;
-             }
-          },
-          min:0
-       },
-       tooltip : {
-          formatter: function () {
-             return '<b>' + this.series.name + '</b><br/>' +
-                this.x + ': ' + this.y;
-          }
-       },
-       plotOptions : {
-          area: {
-             fillOpacity: 0.5 
-          }
-       },
-       credits:{
-          enabled: false
-       },
-       series: [
-          {
-             name: 'John',
-             data: [3, 4, 3, 5, 4, 10, 12]
-          }, 
-          {
-             name: 'Jane',
-             data: [1, 3, 4, 3, 3, 5, 4]
-          }
-       ]
-    };
+
+   ngOnInit(){
+      this.update();     
+   }
+
+   ngOnChanges( changes: SimpleChanges ){
+      this.update();
+   }
+
+   update(){
+      const options = new Object(
+      {   
+         chart: {
+            type: 'area'
+         },
+         title: {
+            text: this.title
+         },
+         subtitle : {
+            style: {
+               position: 'absolute',
+               right: '0px',
+               bottom: '10px'
+            }
+         },
+         legend : {
+            layout: 'vertical',
+            align: 'left',
+            verticalAlign: 'top',
+            x: -150,
+            y: 100,
+            floating: true,
+            borderWidth: 1,
+            backgroundColor: '#FFFFFF'
+         },
+         xAxis:{
+            categories: this.categories
+         },
+         yAxis : {
+            title: {
+               text: 'Температура (℃)'
+            },
+            labels: {
+               formatter: function () {
+                  return this.value;
+               }
+            },
+            min: 0
+         },
+         tooltip : {
+            formatter: function () {
+               return '<b>' + this.series.name + '</b><br/>' + this.x + ': ' + this.y;
+            }
+         },
+         plotOptions : {
+            area: {
+               fillOpacity: 0.5 
+            }
+         },
+         credits:{
+            enabled: false
+         },
+         series: this.series
+      });
+      if ( !this.node ) {
+            console.error('#node not defined at template of shared chart component');
+      } else {
+            this.charts.chart(this.node.nativeElement, options);
+      }      
+   }
+      
 }

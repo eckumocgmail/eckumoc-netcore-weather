@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 import { CitiesService } from './../services/cities.service';
 import { OpenWeatherService } from './../services/open-weather.service';
 import { OnecallResponseModel } from '../models/onecall-response.model';
-import { ChartService } from 'src/app/services/chart.service';
+import { ChartService } from 'src/app/shared/chart/chart.service';
 
 import * as Highcharts from 'highcharts';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
@@ -219,12 +219,11 @@ export class DailyComponent implements OnInit,OnChanges {
                return this.value;
             }
          },
-         min:0
+         min: 0
       },
       tooltip : {
          formatter: function () {
-            return '<b>' + this.series.name + '</b><br/>' +
-               this.x + ': ' + this.y;
+            return '<b>' + this.series.name + '</b><br/>' + this.x + ': ' + this.y;
          }
       },
       plotOptions : {
@@ -236,10 +235,9 @@ export class DailyComponent implements OnInit,OnChanges {
          enabled: false
       },
       series: this.series
-    }
-    );
+    });
     if ( !this.node ) {
-        console.error('chartElement undefined in StructureChartComponent');
+        console.error('#node not defined at template of shared chart component');
     } else {
         this.charts.chart(this.node.nativeElement, options);
     }

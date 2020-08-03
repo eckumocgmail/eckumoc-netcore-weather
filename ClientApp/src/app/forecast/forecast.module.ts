@@ -13,6 +13,7 @@ import { DailyComponent } from './daily/daily.component';
 import { TimeUtilitiesService } from './services/time-utilities.service';
 import { IconsDispatcherService } from './services/icons-dispatcher.service';
 import { MatIconModule } from '@angular/material/icon';
+import { SharedModule } from '../shared/shared.module';
 
 
 
@@ -22,6 +23,7 @@ import { MatIconModule } from '@angular/material/icon';
   ],
   imports: [
     CommonModule,
+    SharedModule,
 
     //deps
     HttpClientModule,
