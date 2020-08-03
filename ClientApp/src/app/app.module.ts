@@ -49,6 +49,7 @@ import { MatTreeModule } from '@angular/material/tree';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { PortalModule } from '@angular/cdk/portal';
 import { registerLocaleData } from '@angular/common';
+import { SharedModule } from './shared/shared.module';
 
 registerLocaleData(localeRu,'ru');
 
@@ -103,7 +104,8 @@ registerLocaleData(localeRu,'ru');
     RouterModule.forRoot([
       { path: '',  loadChildren: () => import('./forecast/forecast.module').then(m => m.ForecastModule)  }
     ]),
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    SharedModule
   ],
   providers: [AppService],
   bootstrap: [AppComponent]

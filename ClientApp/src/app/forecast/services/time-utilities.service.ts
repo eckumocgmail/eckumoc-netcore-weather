@@ -33,8 +33,10 @@ export class TimeUtilitiesService
       d = new Date(d*1000);
     }
     const date = d;
-    const days = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресение'];
-    return days[date.getDay()];
+    /*const days = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресение'];
+    return days[date.getDay()-1];*/
+
+    return d.toLocaleString('ru',{weekday: 'long'});
   }
 
 

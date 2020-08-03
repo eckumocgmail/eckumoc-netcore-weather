@@ -39,7 +39,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTreeModule } from '@angular/material/tree';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 
 
 
@@ -91,6 +91,11 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatTreeModule,
     PortalModule,
     ScrollingModule,
+  ],
+  providers: [
+    //{provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: {useUtc: true}}
+    {provide: MAT_DATE_LOCALE, useValue: 'ru-Ru'}
   ]
+
 })
 export class DailyModule { }

@@ -1,4 +1,4 @@
-import { WeatherModel } from './../../models/weather.model';
+import { WeatherModel } from './weather.model';
 
 export class OnecallResponseModel
 {

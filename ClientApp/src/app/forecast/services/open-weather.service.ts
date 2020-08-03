@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { CitiesService } from './cities.service';
 import { ForecastModel } from './../models/forecast.model';
 import { TimeUtilitiesService } from './time-utilities.service';
-import { OnecallResponseModel } from './messages/onecall-response.model';
+import { OnecallResponseModel } from '../models/onecall-response.model';
 
 @Injectable()
 export class OpenWeatherService

@@ -49,8 +49,7 @@ import { IconsDispatcherService } from './services/icons-dispatcher.service';
       </div>
       <!-- <hr/> -->
     </div>
-
-    <!-- <img [attr.src]="icons.getSnowUrl()"/> -->
+    
     <button mat-raised-button *ngIf="forecast" style="margin: 10px; padding: 0px; width: 100%;">
 
       <div>

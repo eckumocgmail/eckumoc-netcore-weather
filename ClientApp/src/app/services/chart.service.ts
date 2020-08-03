@@ -25,7 +25,7 @@ export class ChartService {
 
   /**
    * @example
-   * .coluimn( 'column chart',
+   * .column( 'column chart',
         [
           { name: 'Subject 1', data: [130, 422, 123, 232]},
           { name: 'Subject 2', data: [230, 420, 523, 432]},

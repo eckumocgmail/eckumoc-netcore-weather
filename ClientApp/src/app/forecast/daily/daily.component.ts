@@ -2,27 +2,40 @@ import { TimeUtilitiesService } from './../services/time-utilities.service';
 
 import { Component, OnInit, OnChanges, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
 import { CityModel } from './../models/city.model';
-import { of, Observable } from 'rxjs';
-import { ForecastModel } from './../models/forecast.model';
+import { of } from 'rxjs';
 import { CitiesService } from './../services/cities.service';
 import { OpenWeatherService } from './../services/open-weather.service';
-import { OnecallResponseModel } from '../services/messages/onecall-response.model';
+import { OnecallResponseModel } from '../models/onecall-response.model';
 import { ChartService } from 'src/app/services/chart.service';
-import { FormGroup, FormControl } from '@angular/forms';
+
+import * as Highcharts from 'highcharts';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+
+declare var require: any;
+const Boost = require('highcharts/modules/boost');
+const noData = require('highcharts/modules/no-data-to-display');
+const More = require('highcharts/highcharts-more');
+
+Boost(Highcharts);
+noData(Highcharts);
+More(Highcharts);
+noData(Highcharts);
 
 @Component({
   selector: 'app-daily',
   templateUrl: './daily.component.html',
   styles: [
-    `.link-active{background-color: black; color: white;}
-      .shadow-box{border-radius: 5px; box-shadow: 0px 4px 3px -2px rgba(0, 0, 0, 0.4), 0px 2px 2px 0px rgba(0, 0, 0, 0.24), 0px 2px 6px 0px rgba(0, 0, 0, 0.22);} `
+   // `.link-active{background-color: black; color: white;}
+    //  .shadow-box{border-radius: 5px; box-shadow: 0px 4px 3px -2px rgba(0, 0, 0, 0.4), 0px 2px 2px 0px rgba(0, 0, 0, 0.24), 0px 2px 6px 0px rgba(0, 0, 0, 0.22);} `
   ]
 })
 export class DailyComponent implements OnInit,OnChanges {
 
   //datepickers model
-  minDate = new Date();
-  maxDate = new Date();
+  minDate = null;
+  maxDate = null;
+  maxDateLimit: Date;
+  minDateLimit: Date;
 
 
   //chart model
@@ -33,6 +46,7 @@ export class DailyComponent implements OnInit,OnChanges {
   cities:   CityModel[];
   city:     CityModel;
   categories: string[] = [];
+  
 
   //params model
   params = [
@@ -63,7 +77,7 @@ export class DailyComponent implements OnInit,OnChanges {
     }else{
       this.setCitylist(this.citiesService.cities);
     }
-    setTimeout(()=>{ctrl.updateChart();},10000);
+    setTimeout(()=>{ctrl.updateChart();},1700);
   }
 
   ngOnChanges( changes: SimpleChanges ){
@@ -77,13 +91,67 @@ export class DailyComponent implements OnInit,OnChanges {
     paramForChanges.value = paramForChanges.value? false: true;
   }
 
+  getMinDate( date1: Date, date2: Date ){
+    if( !date1 && !date2 ) return null;
+    if( !date1 ){
+      date1 = new Date('10.10.2040');
+    }
+    if( !date2 ){
+      date2 = new Date('10.10.2040');
+    }
+    return date1.getTime()<date1.getTime()? date1: date2;
+  }
+
+  onDateChange( keyToProperty: string, event: MatDatepickerInputEvent<any> ){
+    console.log( event );
+    switch(keyToProperty){
+      case 'minDate':  
+        this.minDate = event.value;
+        break;
+      case 'maxDate':
+        this.maxDate = event.value;
+        break;
+    }
+    this.updateSeriesByCalendar( this.minDate, this.maxDate );
+  }
+
+  updateSeriesByCalendar( min: Date, max: Date ){
+    const ctrl = this;
+    of(ctrl.cities[ Math.floor(Math.random()*ctrl.cities.length)]).subscribe((_city: CityModel)=>{
+      console.log(_city);
+      ctrl.city = _city;
+      ctrl.service.getOneCall(_city.name, new Date() ).subscribe((onecall: OnecallResponseModel)=>{
+
+        console.log( onecall );
+        ctrl.onecall = onecall;
+        let i1 = Math.floor(onecall.daily.length*Math.random());
+        let i2 = Math.floor(onecall.daily.length*Math.random());
+
+        const tempDays = onecall.daily;
+        const days = onecall.daily.filter((day)=>{
+
+          console.log( 'dt=',day.dt, 'min=',min.getTime()/1000,'max=',day.dt<=(max.getTime()/1000));
+          return day.dt>=(min.getTime()/1000) && day.dt<=(max.getTime()/1000);
+        });
+        onecall.daily = days;
+        
+        if( ctrl.view=='chart' ){
+          ctrl.updateChart();
+        }
+        this.minDateLimit = new Date(tempDays[0].dt*1000);
+        this.maxDateLimit = new Date(tempDays[tempDays.length-1].dt*1000);
+      });
+    });
+  }  
+
   setView( view: 'table'|'chart' ){
     console.log( view );
     this.view = view;
     this.updateChart();
   }
 
-  updateSeries(){
+
+  updateSeries( ){
     const ctrl = this;
     const props = {};
     this.series = [];
@@ -92,39 +160,84 @@ export class DailyComponent implements OnInit,OnChanges {
 
     if( !this.onecall || !this.onecall.daily ){
       return;
-    }else{
-      ctrl.minDate = new Date('01.01.2970');
-      ctrl.maxDate = new Date('01.01.1970');
+    }else{            
       this.onecall.daily.forEach(day=>{
         let d: Date = new Date(day.dt*1000);
         let datestr =
           (d.getDate()<10?'0'+d.getDate(): d.getDate())+'.'+
           (d.getMonth()<10?'0'+d.getMonth(): d.getMonth())+'.'+
           (d.getFullYear());
-        datestr = ctrl.timeUtilitiesService.getDayOfWeek(d) + '('+datestr+')';
-        ctrl.minDate = ctrl.minDate.getTime()>d.getTime()? d: ctrl.minDate;
-        ctrl.maxDate = ctrl.maxDate.getTime()<d.getTime()? d: ctrl.maxDate;
-        if( ctrl.categories.indexOf(datestr)==-1 ){
+        //datestr = //ctrl.timeUtilitiesService.getDayOfWeek(d) + '('+datestr+')';
+//          this.timeUtilitiesService.getFullDayOfWeek(d);
+        ctrl.minDateLimit = ctrl.minDate = (ctrl.minDate?ctrl.minDate.getTime():new Date().getTime())>(d.getTime())? d: ctrl.minDate;
+        ctrl.maxDateLimit = ctrl.maxDate = (ctrl.maxDate?ctrl.maxDate.getTime():new Date().getTime())<(d.getTime())? d: ctrl.maxDate;
+        //if( ctrl.categories.indexOf(datestr)==-1 ){
           ctrl.categories.push(datestr);
-        }
+        //}
         props['temp'].data.push(day.temp.day);
       });
+      
     }
   }
 
   updateChart(){
     this.updateSeries();
-    const options = new Object({
-        series: this.series,
-        xAxis: {
-          categories: this.categories,
-          units: 'Цельсии',
-        },
-        title: {
-          text: this.title,
-          type: 'area'
-        }
-    });
+    const options = new Object(
+    {   
+      chart: {
+         type: 'area'
+      },
+      title: {
+         text: this.title
+      },
+      subtitle : {
+         style: {
+            position: 'absolute',
+            right: '0px',
+            bottom: '10px'
+         }
+      },
+      legend : {
+         layout: 'vertical',
+         align: 'left',
+         verticalAlign: 'top',
+         x: -150,
+         y: 100,
+         floating: true,
+         borderWidth: 1,
+         backgroundColor: '#FFFFFF'
+      },
+      xAxis:{
+         categories: this.categories
+      },
+      yAxis : {
+         title: {
+            text: 'Температура (℃)'
+         },
+         labels: {
+            formatter: function () {
+               return this.value;
+            }
+         },
+         min:0
+      },
+      tooltip : {
+         formatter: function () {
+            return '<b>' + this.series.name + '</b><br/>' +
+               this.x + ': ' + this.y;
+         }
+      },
+      plotOptions : {
+         area: {
+            fillOpacity: 0.5 
+         }
+      },
+      credits:{
+         enabled: false
+      },
+      series: this.series
+    }
+    );
     if ( !this.node ) {
         console.error('chartElement undefined in StructureChartComponent');
     } else {
@@ -159,6 +272,10 @@ export class DailyComponent implements OnInit,OnChanges {
     });
   }
 
+  /**
+   * Метод обновления данных для представления. 
+   * На момент обновления данные о городах должны находится в переменной cities.
+   */
   updateData(){
     const ctrl = this;
     of(ctrl.cities[ Math.floor(Math.random()*ctrl.cities.length)]).subscribe((_city:CityModel)=>{
@@ -171,7 +288,6 @@ export class DailyComponent implements OnInit,OnChanges {
           ctrl.updateChart();
         }
       });
-
     });
   }
 
@@ -179,14 +295,5 @@ export class DailyComponent implements OnInit,OnChanges {
     this.cities = cities;
     this.updateData();
   }
-
-
-
-
-
-
-
-
-
 
 }

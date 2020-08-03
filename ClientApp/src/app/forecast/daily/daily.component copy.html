@@ -1,0 +1,129 @@
+<div *ngIf="city" style="width: 100%;">
+
+  <h1>{{city.country}}, {{city.name}}</h1>
+
+  <div style="display: flex; flex-direction: row; width: 100%; flex-wrap: nowrap;">
+
+
+    <div style="width: 100%; padding-left: 20px; padding-right: 20px; padding:20px; display: flex; flex-direction: row;">
+
+        <!-- open side menu -->
+        <button mat-raised-button (click)="leftSide.opened=true && rightSide.opened=true" class="link-active">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <button mat-raised-button (click)="setRandomTimeRange()" class="link-active">
+          случайный период
+        </button>
+
+
+        <!-- view context menu -->
+        <button mat-raised-button [matMenuTriggerFor]="menu" [matTooltip]="'Вид'" aria-label="Example icon-button with a menu" style="justify-self: flex-end; margin-left: auto;">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <button mat-raised-button (click)="leftSide.opened=true && rightSide.opened=true" class="link-active">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="setView('table')">
+              <mat-icon>border_all</mat-icon>
+              <span style="width: 100%;"> таблица </span>
+            </button>
+            <button mat-menu-item (click)="setView('chart')">
+              <mat-icon>insert_chart</mat-icon>
+              <span  style="width: 100%;"> диаграмма </span>
+            </button>
+        </mat-menu>
+    </div>
+  </div>
+</div>
+
+<div style="display: flex; flex-direction: row; flex-wrap: nowrap; width: 100%; height: 100%; width: 100%; ">
+  <mat-drawer-container style="width: 100%;">
+
+
+    <!-- left side nav -->
+    <mat-drawer mode="side" #leftSide>
+      <div (mouseleave)="!(leftSide.opened=false) && !(rightSide.opened=false)">
+        <h6>Параметры: </h6>
+        <mat-button-toggle-group style="width: 100%;" [multiple]="true" style="display: flex; flex-direction: column; flex-wrap: nowrap;">
+          <mat-button-toggle *ngFor="let param of params" (change)="toggleParam(param.name)"  [value]="param.value" style="width: 100%;"  > {{ param.label }} </mat-button-toggle>
+        </mat-button-toggle-group>
+
+      </div>
+    </mat-drawer>
+
+    <!-- right side nav -->
+    <mat-drawer mode="side" position="end" #rightSide>
+      <div (mouseleave)="!(leftSide.opened=false)&&!(rightSide.opened=false)">
+        <mat-form-field appearance="fill">
+          <mat-label>Начало периода</mat-label>
+          <input matInput [matDatepicker]="beginPicker" [(ngModel)]="minDate" (input)="trace($event)" (changes)="trace($event)">
+          <mat-datepicker-toggle matSuffix [for]="beginPicker" (changes)="trace($event)"></mat-datepicker-toggle>
+          <mat-datepicker #beginPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Конец пеиода</mat-label>
+          <input matInput [matDatepicker]="endPicker" [min]="minDate" [(ngModel)]="maxDate" (input)="trace($event)" (changes)="trace($event)">
+          <mat-datepicker-toggle matSuffix [for]="endPicker" (changes)="trace($event)"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+    </mat-drawer>
+
+    <mat-drawer-content style="width: 100%; ">
+
+      <!-- table view -->
+      <div style="width: 100%;">
+        <div *ngIf="view=='table'" style="width: 100%;">
+          <table class="table" *ngIf="onecall" style="width: 100%;">
+            <thead>
+              <tr>
+                <th scope="col">Дата</th>
+                <th scope="col">Утро</th>
+                <th scope="col">День</th>
+                <th scope="col">Вечер</th>
+                <th scope="col">Ночь</th>
+
+              </tr>
+            </thead>
+            <tbody *ngIf="onecall.daily">
+              <tr *ngFor="let day of onecall.daily">
+                <th scope="row"> {{(day.dt*1000) | date: 'dd.MM.yyyy'}} </th>
+
+                <td>{{day.temp.morn}} </td>
+                <td>{{day.temp.day}} </td>
+                <td>{{day.temp.eve}} </td>
+                <td>{{day.temp.night}} </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- chart view -->
+        <div [hidden]="view!='chart'" style=" width: 100%; ">
+          <button #node style="width: 100%; height: 100%;" >
+          </button>
+        </div>
+      </div>
+
+      <!-- bottom panels -->
+      <div *ngIf="onecall" style="display: flex; flex-direction: row; flex-wrap: wrap;" >
+        <div style="justify-self: flex-end; margin: 3px;  margin-left: auto; width: 133px;" align="center" *ngFor="let day of onecall.daily" >
+          <button class="shadow-box" style="background-color: black; color: white;" *ngIf="day">
+            <b> {{ timeUtilitiesService.getFullDayOfWeek(day.dt) }} </b>
+            <div align="center" style="width: 100%;">
+              <p>{{ day.temp.day }}℃</p>
+            </div>
+            <div *ngFor="let weather of day.weather">
+              <img [attr.src]="'http://openweathermap.org/img/wn/'+weather.icon.replace('n','d')+'@'+'2x.png'"/>
+              <div style=" word-wrap: break-word;">{{ weather.description.split(' ')[0] }}</div>
+            </div>
+            <p> {{ (day.dt*1000) | date: 'dd.MM.yyyy'}} </p>
+          </button>
+        </div>
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
+
+</div>
