@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ViewChild, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, Input, OnChanges, SimpleChanges, Output, EventEmitter, OnDestroy } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import { ChartService } from './chart.service';
 
@@ -20,7 +20,7 @@ noData(Highcharts);
   `,
   styles: []
 })
-export class ChartComponent implements OnInit, OnChanges {
+export class ChartComponent implements OnInit, OnChanges, OnDestroy {
 
    @ViewChild('node', {static: true} ) node: ElementRef;
 
@@ -29,12 +29,20 @@ export class ChartComponent implements OnInit, OnChanges {
    @Input() series: { name: string, data: number[] }[] = [];
    @Input() categories: string[] = [];
 
+   @Output() init = new EventEmitter();
+   @Output() destroy = new EventEmitter();
+
    constructor( 
       private charts: ChartService ){
    }
 
    ngOnInit(){
       this.update();     
+      this.init.emit(this);
+   }
+
+   ngOnDestroy(){
+      this.destroy.emit();
    }
 
    ngOnChanges( changes: SimpleChanges ){
@@ -72,7 +80,7 @@ export class ChartComponent implements OnInit, OnChanges {
          },
          yAxis : {
             title: {
-               text: 'Температура (℃)'
+               text: this.yLabel
             },
             labels: {
                formatter: function () {

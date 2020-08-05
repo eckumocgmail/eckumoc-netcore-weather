@@ -37,27 +37,23 @@ export class DailyComponent implements OnInit,OnChanges {
   maxDateLimit: Date;
   minDateLimit: Date;
 
-
-  //chart model
-  @ViewChild('node', {static: true} ) node: ElementRef;
-  title = 'Динамика изменения температуры';
-  //series: { name: string, data: number[] }[] = [];
-  view:     'table'|'chart'='chart';
+  //common model
+  title = 'Динамика изменения температуры';    
   cities:   CityModel[];
   city:     CityModel;
   categories: string[] = [];
   
-
-  //params model
+  //chart model
+  @ViewChild('node', {static: true} ) node: ElementRef;  
   params = [
-    { label: 'температура', name: 'temp',     value: true , data: [] },
-    { label: 'влажность',   name: 'humidity', value: false, data: [] },
-    { label: 'давление',    name: 'pressure', value: false, data: [] },
+    { label: 'Температура', name: 'temp',     value: false , data: [], chart: null, yLabel: 'температура ( ℃ )' },
+    { label: 'Влажность',   name: 'humidity', value: false,  data: [], chart: null, yLabel: 'влажность ( % )' },
+    { label: 'Давление',    name: 'pressure', value: false,  data: [], chart: null, yLabel: 'давление ( гПа )' },
   ]
   paramsMap = {
     temp:     this.params[0],
     humidity: this.params[1],
-    pressure: this.params[2],
+    pressure: this.params[2]
   }
 
   //data model
@@ -134,23 +130,15 @@ export class DailyComponent implements OnInit,OnChanges {
           return day.dt>=(min.getTime()/1000) && day.dt<=(max.getTime()/1000);
         });
         onecall.daily = days;
+                
+        ctrl.updateChart();
         
-        if( ctrl.view=='chart' ){
-          ctrl.updateChart();
-        }
         this.minDateLimit = new Date(tempDays[0].dt*1000);
         this.maxDateLimit = new Date(tempDays[tempDays.length-1].dt*1000);
       });
     });
   }  
-
-  setView( view: 'table'|'chart' ){
-    console.log( view );
-    this.view = view;
-    this.updateChart();
-  }
-
-
+   
   updateSeries( ){
     const ctrl = this;
     const props = {};
@@ -161,7 +149,8 @@ export class DailyComponent implements OnInit,OnChanges {
 
     // ###
     ctrl.paramsMap.temp.data.push(props['temp']={ name: 'Температура', data: [] });
-
+    ctrl.paramsMap.humidity.data.push(props['humidity']={ name: 'Влажность', data: []});
+    ctrl.paramsMap.pressure.data.push(props['pressure']={ name: 'Давление', data: []});
     if( !this.onecall || !this.onecall.daily ){
       return;
     }else{            
@@ -171,16 +160,14 @@ export class DailyComponent implements OnInit,OnChanges {
           (d.getDate()<10?'0'+d.getDate(): d.getDate())+'.'+
           (d.getMonth()<10?'0'+d.getMonth(): d.getMonth())+'.'+
           (d.getFullYear());
-        //datestr = //ctrl.timeUtilitiesService.getDayOfWeek(d) + '('+datestr+')';
-//          this.timeUtilitiesService.getFullDayOfWeek(d);
         ctrl.minDateLimit = ctrl.minDate = (ctrl.minDate?ctrl.minDate.getTime():new Date().getTime())>(d.getTime())? d: ctrl.minDate;
-        ctrl.maxDateLimit = ctrl.maxDate = (ctrl.maxDate?ctrl.maxDate.getTime():new Date().getTime())<(d.getTime())? d: ctrl.maxDate;
-        //if( ctrl.categories.indexOf(datestr)==-1 ){
-          ctrl.categories.push(datestr);
-        //}
+        ctrl.maxDateLimit = ctrl.maxDate = (ctrl.maxDate?ctrl.maxDate.getTime():new Date().getTime())<(d.getTime())? d: ctrl.maxDate;        
+        ctrl.categories.push(datestr);        
 
         // ###
         props['temp'].data.push(day.temp.day);
+        props['humidity'].data.push(day.humidity);
+        props['pressure'].data.push(day.pressure);
       });
       
     }
@@ -188,6 +175,11 @@ export class DailyComponent implements OnInit,OnChanges {
 
   updateChart(){
     this.updateSeries();     
+    this.params.forEach(param=>{
+      if( param.chart ){
+        param.chart.update();
+      }
+    });
   }
 
   trace( evt ){
@@ -210,9 +202,9 @@ export class DailyComponent implements OnInit,OnChanges {
           days.push(onecall.daily[i]);
         }
         onecall.daily = days;
-        if( ctrl.view=='chart' ){
-          ctrl.updateChart();
-        }
+        
+        ctrl.updateChart();
+        
       });
     });
   }
@@ -228,10 +220,8 @@ export class DailyComponent implements OnInit,OnChanges {
       ctrl.city = _city;
       ctrl.service.getOneCall(_city.name, new Date() ).subscribe((onecall: OnecallResponseModel)=>{
         console.log( onecall );
-        ctrl.onecall = onecall;
-        if( ctrl.view=='chart' ){
-          ctrl.updateChart();
-        }
+        ctrl.onecall = onecall;        
+        ctrl.updateChart();        
       });
     });
   }

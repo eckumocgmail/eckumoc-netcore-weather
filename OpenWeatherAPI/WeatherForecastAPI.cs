@@ -22,11 +22,13 @@ namespace eckumoc_netcore_weather_api.OpenWeatherAPI
         /// <summary>
         /// Запрос прогноза погоды по имени города
         /// </summary>
-        /// <param name="cityname">имя города</param>
-        // https://api.openweathermap.org/data/2.5/weather?id=498817&units=metric&appid=e50b1efc362606b154d86dcb2e86a9ba&lang=ru
+        /// <param name="cityname">имя города</param>        
+        /// <example>
+        /// https://api.openweathermap.org/data/2.5/weather?id=498817&units=metric&appid=e50b1efc362606b154d86dcb2e86a9ba&lang=ru
+        /// </example>
         public async Task<string> GetWeatherForecastByCity( string cityname )
         {
-            //https://api.openweathermap.org/data/2.5/weather?id=498817&units=metric&appid=e50b1efc362606b154d86dcb2e86a9ba&lang=ru
+            
             Dictionary<string, object> pars = new Dictionary<string, object>();
             pars["q"] = $"{cityname}";
             pars["lang"] = "ru";

@@ -1,4 +1,4 @@
-Приложение ASP.NET Core SPA Angular.
+ASP.NET Core SPA Angular.
 Версия dotnet: 3.1.301.
 Версия npm: 
 {
