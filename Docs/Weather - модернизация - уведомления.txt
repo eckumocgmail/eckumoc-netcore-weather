@@ -1,0 +1,85 @@
+
+
+Например:   
+  Мы хотим модернизировать наше приложение с прогнозом погоды и оповещать пользователя о погодных изменениях: дождь может закончится, погода может улучшиться 
+  Для этого можно использовать технологию SignalR.  
+  На клиенте стоит определить функцию, которая отображают информацию в нижней-правой части экрана. 
+  Далее потребуется связать функции через SignalR.
+
+  Серверная часть.  
+  - Для установки соединения с клиентом необходимо установить библиотеку Microsoft SignalR, подключить службу SignalR и
+  создать Hub( класс отчающий за обмен сообщениями с клиентом ) и сконфигурировать конвеер обработки запросов таким определенным образом, сопоставив опредёлённый маршрут Hub'у.
+  - Для установки библиотеки используем менеджер пакетов NuGET, выполняем команду:
+  dotnet add package Microsoft.AspNet.SignalR --version 2.4.1
+  -Создаем Hub в папочке Hubs/MessageHub наследуемый от класса Hub библиотеки SignalR.  
+  -Регистрация Hub в классе Startup, выполняется 2-умя строчками:
+
+public void ConfigureServices(IServiceCollection services)
+{  
+  services.AddSignalR();
+}
+
+и
+
+public void Configure(IApplicationBuilder app, IHostingEnvironment env){
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<MessageHub>("/message");
+            });}
+
+После этого объект Hub доступен по сетевым протоколам и способен работать, как Http-запрсоы так и работать с сокетами. 
+
+Кстати, в конструкторе данного класса можно определить объекты других сервисов ASP.NET, например такие как 
+DbContext знаменитого EntityFramwork, Logger для упрощения процесса разработки и отладки и пр.. 
+
+Механизм DI (Dependecy Injection), определит тип сервиса, найдет и вернёт ссылку на объект.
+
+Добавить контекст данных можно методами:
+            services.AddDbContext<RealmDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("RealmConnection")));
+            
+            services.AddDbContext<AdventureWorksDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("AdventureWorks2017")));             
+            services
+                .AddAuthentication( CookieAuthenticationDefaults.AuthenticationScheme )
+                .AddCookie(options => //CookieAuthenticationOptions
+                {
+                    options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Signin");
+                }
+            );
+
+   Клиентская часть.Для соединения с сервером потребуется: установить библиотеку signalr, установить конфигурацию и выполнить соединение. 
+  Для установки библиотеки используем менеджер пакетом npm, выполняем команду:npm install @microsoft/signalr
+Эта команда загрузит файлы библиотеки в проект клиентской части в каталог ClientApp/node_modules/@microsoft/signalr.Для обмена сообщениями с сервером служит класс TypeScript ClientApp/src/app/services/hub-connector.ts. Данный класс является классом типа Service в архитектуре приложения Angular и доступен в любой части приложения, об этом нам говорит аннотация класса:
+@Injectable( )И так, подключаем объекты библиотеки необходимые для установки соединения с сервером.
+import { HubConnectionBuilder, HubConnection, LogLevel, ILogger, HttpTransportType, HubConnectionState } from '@microsoft/signalr';
+
+  HubConnectionBuilder -  используется для настройки соединения, впитывает в себя конфигурацию подключения и методом build() возвращает соединение.
+  LogLevel, ILogger, HttpTransportType - используются для настройки соединения, а именно логирования и транспортного протокола. 
+
+ Далее, определяем метод connect() в HubConnectorService
+/**
+   * Установка соединения с серверным хаб-контроллером
+   * @param hubUri - идентификатор ресурса в контексте домена
+   */
+  connect(  ) {
+    const ctrl = this;
+    const baseUrl = location.origin + this.HUB_URI;
+    const builder: HubConnectionBuilder = new HubConnectionBuilder();
+    this.connection = builder.configureLogging( LogLevel.Debug )
+    .withUrl( baseUrl, {
+        // accessTokenFactory: () => this.token,   ключ авторизации
+        skipNegotiation:    true,
+        logMessageContent:  false,
+        logger:             this,
+        transport:          HttpTransportType.WebSockets
+    }).build();
+}
+  Тут можно пределить тип транспортного протокола, настроить лоргирование сообщений и пр.
+  Далее в обьект connecton, следует зарегистрировать функцию, которая и будет выбрасывать уведомление на экран.
+  Делается это через метод on() c параметром 'notify', и функцией notify;
+
+  Это позволит вызывать функции отображения уведомлений с сервера в обьекте Hub, через метод ClientContext.Invoke('notification').
+
